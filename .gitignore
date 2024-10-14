@@ -1,2 +1,16 @@
 # ignora setarile locale ale editorului VS Code
 .vscode/
+
+# Ignoră fișierele obiect și binarele rezultate din compilare
+*.o
+*.out
+*.exe
+
+# Ignoră fișierele de build și temporare
+build/
+*.log
+*.tmp
+
+# Ignoră fișiere de sistem
+.DS_Store
+Thumbs.db
