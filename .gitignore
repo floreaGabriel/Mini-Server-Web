@@ -14,3 +14,7 @@ build/
 # Ignoră fișiere de sistem
 .DS_Store
 Thumbs.db
+
+# Ignora .dsym
+
+*.dSYM

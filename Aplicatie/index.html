@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In și Test GET, POST, PUT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7d58b;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, textarea {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .register {
+            margin-top: 20px;
+            background-color: #007bff;
+        }
+        .register:hover {
+            background-color: #0056b3;
+        }
+        img {
+            margin-top: 20px;
+            width: 300px; /* ajustați dimensiunea imaginii după cum este necesar */
+            height: auto;
+        }
+        .search-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .search-bar input {
+            padding: 5px;
+            font-size: 14px;
+        }
+        .search-bar button {
+            padding: 5px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sign In și Testare GET, POST, PUT</h1>
+
+    <!-- Formular pentru Sign In -->
+    <form id="signInForm" method="POST" action="/signin">
+        <h2>Sign In</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Introduceți username-ul">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Introduceți parola">
+        <button type="submit">Sign In</button>
+    </form>
+
+    <!-- Buton pentru Register -->
+    <form action="/register.html">
+        <button type="submit" class="register">Register</button>
+    </form>
+
+    <!-- Formular pentru GET -->
+    <form id="getForm" method="GET" action="/get.html">
+        <h2>Test GET Request</h2>
+        <label for="getParam">Parametru GET:</label>
+        <input type="text" id="getParam" name="parametru" placeholder="Introduceți un parametru pentru GET">
+        <button type="submit">Trimite GET</button>
+    </form>
+
+    <!-- Formular pentru POST -->
+    <form id="postForm" method="POST" action="/post">
+        <h2>Test POST Request</h2>
+        <label for="postData">Date POST:</label>
+        <textarea id="postData" name="data" rows="4" placeholder="Introduceți date pentru POST"></textarea>
+        <button type="submit">Trimite POST</button>
+    </form>
+
+    <!-- Formular pentru PUT -->
+    <form id="putForm" method="POST" action="/put?_method=PUT">
+        <h2>Test PUT Request</h2>
+        <label for="putData">Date PUT:</label>
+        <textarea id="putData" name="data" rows="4" placeholder="Introduceți date pentru PUT"></textarea>
+        <button type="submit">Trimite PUT</button>
+    </form>
+
+    <!-- Imaginea adăugată -->
+    <img src="img.png" alt="Test Image">
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <form method="GET" action="/search">
+            <input type="text" name="cautare" placeholder="Caută...">
+            <button type="submit">Caută</button>
+        </form>
+    </div>
+
+</body>
+</html>
