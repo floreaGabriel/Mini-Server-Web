@@ -1,9 +1,13 @@
+#include "threadpool.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
+
+
+#define NUM_THREADS 10  
 
 #define PORT 8080
 #define BUFFER_SIZE 2048
@@ -199,6 +203,8 @@ void handleMethods(const char* method, char* path, int client_socket)
 
 void handleConnection(int client_socket)
 {
+    printf("Thread %ld procesează conexiunea pe socketul %d\n", std::this_thread::get_id(), client_socket);
+
     char buffer[BUFFER_SIZE];
     int bytesRead;
 
@@ -224,6 +230,7 @@ void handleConnection(int client_socket)
 
 int main(int argc, char* argv[])
 {
+    threadpool pool(NUM_THREADS);
 
     int server_fd;
     struct sockaddr_in address;
@@ -244,17 +251,9 @@ int main(int argc, char* argv[])
 
     // atasam socketul la un port
 
-   // Prima setare - SO_REUSEADDR
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
-        perror("setsockopt SO_REUSEADDR");
-        exit(EXIT_FAILURE);
-    }
-
-    // A doua setare - SO_REUSEPORT
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)))
-    {
-        perror("setsockopt SO_REUSEPORT");
+        perror("setsockopt");
         exit(EXIT_FAILURE);
     }
 
@@ -287,19 +286,23 @@ int main(int argc, char* argv[])
     int client_socket;
 
 
-    while(1)
+    while (1)
     {
-        if((client_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
+        int client_socket;
+        if ((client_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
         {
             perror("accept");
             exit(EXIT_FAILURE);
         }
 
-        printf("Serverul a acceptat conexiunea pe portul 8080...\n");
+        printf("Conexiune acceptata pe socketul %d\n", client_socket);
 
-        handleConnection(client_socket);
-
+        // Adaugăm o funcție lambda în coada threadpool-ului care să proceseze conexiunea
+        pool.enqueue([client_socket] {
+            handleConnection(client_socket);
+        });
     }
+
 
     
 
