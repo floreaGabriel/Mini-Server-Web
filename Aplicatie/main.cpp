@@ -7,9 +7,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-
-
-
 #define NUM_THREADS 10  
 
 #define PORT 8080
