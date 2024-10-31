@@ -4,6 +4,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
 
 
 
@@ -251,7 +254,7 @@ int main(int argc, char* argv[])
 
     // atasam socketul la un port
 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR , &opt, sizeof(opt)))
     {
         perror("setsockopt");
         exit(EXIT_FAILURE);
@@ -266,7 +269,7 @@ int main(int argc, char* argv[])
 
     // atasam socketul la port
 
-    if(bind(server_fd, (struct sockaddr*)&address, sizeof(address)))
+    if(::bind(server_fd, (struct sockaddr*)&address, sizeof(address)))
     {
         perror("bind");
         exit(EXIT_FAILURE);
@@ -286,6 +289,7 @@ int main(int argc, char* argv[])
     int client_socket;
 
 
+    
     while (1)
     {
         int client_socket;

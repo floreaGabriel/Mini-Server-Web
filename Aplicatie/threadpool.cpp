@@ -1,10 +1,5 @@
 #include "threadpool.h"
 
-
-
-
-
-
 threadpool::threadpool(size_t numar_threaduri) 
 {
     for (size_t i=0;i<numar_threaduri;++i)
