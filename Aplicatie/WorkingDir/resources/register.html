@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7d58b;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .back {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+        .back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Register</h1>
+
+    <!-- Formular pentru Register -->
+    <form id="registerForm" method="POST" action="/register">
+        <h2>Inregistrare</h2>
+        <label for="newUsername">Username:</label>
+        <input type="text" id="newUsername" name="username" placeholder="Introduceți un username">
+        <label for="newPassword">Password:</label>
+        <input type="password" id="newPassword" name="password" placeholder="Introduceți o parolă">
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Buton pentru a te întoarce la pagina principală -->
+    <form action="/index.html">
+        <button type="submit" class="back">Înapoi la pagina principală</button>
+    </form>
+
+</body>
+</html>
