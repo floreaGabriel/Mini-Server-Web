@@ -41,6 +41,7 @@ void Server::handleMethods(const char* method, char* path, int client_socket)
     {
         GetHandler* get = new GetHandler();
         get->handleGetPath(path, client_socket);
+        free(get);
     } else if (strcmp(method, "POST") == 0) {
        // handlePostPath(path);
     } else if (strcmp(method, "PUT") == 0) {
