@@ -38,123 +38,119 @@ void GetHandler::handleGetStaticFile(const char* filename, const char* contentTy
     fclose(file);
 }
 
-int GetHandler::parseURLParam(char* path, URLParameters params[], int maxSize) {
-    char* query = strstr(path, "?");
-    if (!query) {
-        return 0; // fara parametri
-    }
 
-    query++;  // sarim peste semnul "?"
+void GetHandler::parseURLParam(const std::string& path) {
+    m_parametrii.clear();
 
-    // forma url : /search?cautare=masina&culoare=rosu
+    size_t questionMarkPos = path.find("?");
 
-    int paramCount = 0;
-    char* token = strtok(query, "&");
-    while (token && paramCount < maxSize) {
-        char* equalSign = strchr(token, '=');
-        if (equalSign) {
-            // Separam cheia de valoare
-            *equalSign = '\0';
-            strcpy(params[paramCount].key, token);
-            strcpy(params[paramCount].value, equalSign + 1);
-            paramCount++;
+    // npos inseamna ca nu am gasit o valoare valida
+    if (questionMarkPos == std::string::npos) return ;
+
+    std::string query = path.substr(questionMarkPos + 1); // extragem partea de dupa "?"
+
+    size_t pos = 0;
+
+    // query poate arata asa: /search?cautare=masina&culoare=rosu
+    while ((pos = query.find("&")) != std::string::npos) {
+        std::string token = query.substr(0, pos);   
+
+        size_t equalSignPos = token.find("=");
+        // daca nu gasim egal impartim in cheie si valoare
+        if (equalSignPos != std::string::npos) {
+            std::string key = token.substr(0, equalSignPos);
+            std::string value = token.substr(equalSignPos + 1);
+            m_parametrii[key] = value;
         }
-        token = strtok(NULL, "&");
+
+        query.erase(0, pos + 1);
     }
-    return paramCount;
+
+
+    size_t equalSignPos = query.find("=");
+    if (equalSignPos != std::string::npos)
+    {
+        std::string key = query.substr(0, equalSignPos);
+        std::string value = query.substr(equalSignPos + 1);
+        m_parametrii[key] = value;
+    }
 }
 
-void GetHandler::handleGetSearch(char* path, int client_socket) {
-    URLParameters params[URL_PARAMS_MAX_SIZE];
-    int paramsCount = parseURLParam(path, params, URL_PARAMS_MAX_SIZE);
 
+void GetHandler::handleGetSearch(int client_socket) {
    
-    if (paramsCount > 0) {
-        char filename[64] = {0};
-        for (int i = 0; i < paramsCount; i++) {
-            // cautam parametrul specific "cautare"
-            if (strcmp(params[i].key, "cautare") == 0) {
-                snprintf(filename, sizeof(filename), "%s.html", params[i].value);
-                break;
-            }
-        }
-        if (strlen(filename) > 0) {
-            // deschidem fisierul corespunzator termenului de cautare
-            FILE* file = fopen(filename, "r");
-            if (file == NULL) {
-                char response[] = "HTTP/1.1 404 NOT FOUND\r\nContent-Type: text/html\r\n\r\n"
-                                "<html><head><title>404 Not Found</title></head>"
-                                "<body><h1>Pagina nu a fost găsită!</h1></body></html>";
-                send(client_socket, response, strlen(response), 0);
-                return;
-            }
+    auto searchParam = m_parametrii.find("cautare");
+    if (searchParam != m_parametrii.end()) // daca am gasit parametrul cautare
+    {
+        std::string filename = searchParam->second + ".html";
 
-            // trimitere header de succes
-            char response_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-            send(client_socket, response_header, strlen(response_header), 0);
-
-            // citim si trimitem continutul fisierului
-            char file_buffer[BUFFER_SIZE];
-            size_t bytes_read_from_file;
-            while ((bytes_read_from_file = fread(file_buffer, 1, sizeof(file_buffer), file)) > 0) {
-                send(client_socket, file_buffer, bytes_read_from_file, 0);  
-            }
-
-            fclose(file);
-        } else {
-            // daca nu exista parametrul "cautare", returnam 400 BAD REQUEST
-            char response[] = "HTTP/1.1 400 BAD REQUEST\r\nContent-Type: text/html\r\n\r\n"
-                              "<html><head><title>400 Bad Request</title></head>"
-                              "<body><h1>Parametrul de căutare nu a fost specificat!</h1></body></html>";
+        
+        FILE* file = fopen(("resources/" + filename).c_str(), "r");
+        if (file == NULL) {
+            const char* response = "HTTP/1.1 404 NOT FOUND\r\nContent-Type: text/html\r\n\r\n"
+                                   "<html><head><title>404 Not Found</title></head>"
+                                   "<body><h1>Pagina nu a fost găsită!</h1></body></html>";
             send(client_socket, response, strlen(response), 0);
+            return;
         }
-    } else {
-        // fara parametri, raspundem cu 400 BAD REQUEST
-        char response[] = "HTTP/1.1 400 BAD REQUEST\r\nContent-Type: text/html\r\n\r\n"
-                          "<html><head><title>400 Bad Request</title></head>"
-                          "<body><h1>Parametrii nu au fost furnizați!</h1></body></html>";
+
+        const char* contentType = getContentType(filename.c_str());
+        char response_header[BUFFER_SIZE];
+        snprintf(response_header, sizeof(response_header), "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n", contentType);
+        send(client_socket, response_header, strlen(response_header), 0);
+
+        char file_buffer[BUFFER_SIZE];
+        size_t bytes_read_from_file;
+        while ((bytes_read_from_file = fread(file_buffer, 1, sizeof(file_buffer), file)) > 0) {
+            send(client_socket, file_buffer, bytes_read_from_file, 0);
+        }
+        fclose(file);
+    }
+    else 
+    {
+        const char* response = "HTTP/1.1 400 BAD REQUEST\r\nContent-Type: text/html\r\n\r\n"
+                               "<html><head><title>400 Bad Request</title></head>"
+                               "<body><h1>Parametrul de căutare nu a fost specificat!</h1></body></html>";
         send(client_socket, response, strlen(response), 0);
     }
 }
 
 
-void GetHandler::handleGetPath(char* path, int client_socket) {
-    char* questionMarkPos = strstr(path, "?");
-    char filename[256];
+void GetHandler::handleGetPath(const std::string& path, int client_socket) {
 
-        
-    if (questionMarkPos) {
-        // daca exista parametrii în URL, decupam partea inainte de "?"
-        size_t pathLen = questionMarkPos - path;
-        strncpy(filename, path, pathLen);
+    parseURLParam(path);
 
-        filename[pathLen] = '\0';  
-        char *p = strdup(filename);
-
-        if (filename[0] == '/' && filename[1] != '\0') {
-            strcpy(filename, p + 1);
-        }
-    } else {
-        // daca nu exista parametrii, folosim intregul path
-        if (strcmp(path, "/") == 0) {
-            strcpy(filename, "index.html");  // implicit la index.html
-        } else {
-            strcpy(filename, path + 1);  // scoatem slash-ul din path
-        }
+    std::string basePath = path;
+    size_t questionMarkPos = path.find("?");
+    if (questionMarkPos != std::string::npos && questionMarkPos == path.size() - 1)
+    {
+        basePath = path.substr(0, questionMarkPos);
     }
 
+    std::cout<< "Path: " << basePath << "\n";
 
-    if (strstr(filename, "search") != NULL) {
-        handleGetSearch(path, client_socket);
-    } else {
-        // Fișiere statice
-        const char* contentType = getContentType(filename);
-        handleGetStaticFile(filename, contentType, client_socket);  
+    if (m_parametrii.find("cautare") != m_parametrii.end())
+    {
+        handleGetSearch(client_socket);
+    }
+    else 
+    {
+        std::string filename;
+        if (basePath == "/")
+        {
+            filename = "index.html";
+        }
+        else
+        {
+            filename = basePath.substr(1);
+        }
+        std::cout<< "Filename: " << filename << "\n";
+        handleGetStaticFile(filename.c_str(), getContentType(filename.c_str()), client_socket);
     }
 }
 
 
-const char* GetHandler::getContentType(char* filename) {
+const char* GetHandler::getContentType(const char* filename) {
     if (strstr(filename, ".html") != NULL) return "text/html";
     if (strstr(filename, ".css") != NULL) return "text/css";
     if (strstr(filename, ".js") != NULL) return "application/javascript";
