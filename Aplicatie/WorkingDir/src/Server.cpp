@@ -46,7 +46,7 @@ void Server::handleMethods(const char* method, char* path, int client_socket, co
         
     } else if (strcmp(method, "PUT") == 0) {
         PutHandler* put = new PutHandler();
-        put->handlePutPath(path, client_socket, buffer);
+        put->handlePutRequest(path, client_socket, buffer);
         free(put);
     }
 }
