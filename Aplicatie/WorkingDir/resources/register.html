@@ -40,6 +40,12 @@
         .back:hover {
             background-color: #0056b3;
         }
+        .update {
+            background-color: #FFA500;
+        }
+        .update:hover {
+            background-color: #FF8C00;
+        }
     </style>
 </head>
 <body>
@@ -56,10 +62,70 @@
         <button type="submit">Register</button>
     </form>
 
+    <!-- Formular pentru Update (PUT) -->
+    <form id="updateForm">
+        <h2>Actualizare Cont</h2>
+        <label for="updateUsername">Username:</label>
+        <input type="text" id="updateUsername" name="username" placeholder="Introduceți username-ul pentru update">
+        <label for="updatePassword">New Password:</label>
+        <input type="password" id="updatePassword" name="password" placeholder="Introduceți noua parolă">
+        <button type="button" class="update" onclick="updateAccount()">Update</button>
+    </form>
+
     <!-- Buton pentru a te întoarce la pagina principală -->
     <form action="/index.html">
         <button type="submit" class="back">Înapoi la pagina principală</button>
     </form>
+
+    <script>
+        // Functia pentru a intercepta și trimite request-ul de înregistrare (POST)
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("newUsername").value;
+            const password = document.getElementById("newPassword").value;
+
+            fetch("/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("Înregistrare reușită!");
+                console.log("Răspuns:", data);
+            })
+            .catch((error) => {
+                alert("Eroare la înregistrare.");
+                console.error("Error:", error);
+            });
+        });
+
+        // Funcția pentru a trimite un request PUT pentru actualizarea contului
+        function updateAccount() {
+            const username = document.getElementById("updateUsername").value;
+            const password = document.getElementById("updatePassword").value;
+
+            fetch("/update", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("Actualizare reușită!");
+                console.log("Răspuns:", data);
+            })
+            .catch((error) => {
+                alert("Eroare la actualizare.");
+                console.error("Error:", error);
+            });
+        }
+    </script>
 
 </body>
 </html>

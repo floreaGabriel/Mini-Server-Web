@@ -86,29 +86,6 @@
         <button type="submit" class="register">Register</button>
     </form>
 
-    <!-- Formular pentru GET -->
-    <form id="getForm" method="GET" action="/get.html">
-        <h2>Test GET Request</h2>
-        <label for="getParam">Parametru GET:</label>
-        <input type="text" id="getParam" name="parametru" placeholder="Introduceți un parametru pentru GET">
-        <button type="submit">Trimite GET</button>
-    </form>
-
-    <!-- Formular pentru POST -->
-    <form id="postForm" method="POST" action="/post">
-        <h2>Test POST Request</h2>
-        <label for="postData">Date POST:</label>
-        <textarea id="postData" name="data" rows="4" placeholder="Introduceți date pentru POST"></textarea>
-        <button type="submit">Trimite POST</button>
-    </form>
-
-    <!-- Formular pentru PUT -->
-    <form id="putForm" method="POST" action="/put?_method=PUT">
-        <h2>Test PUT Request</h2>
-        <label for="putData">Date PUT:</label>
-        <textarea id="putData" name="data" rows="4" placeholder="Introduceți date pentru PUT"></textarea>
-        <button type="submit">Trimite PUT</button>
-    </form>
 
     <!-- Imaginea adăugată -->
     <img src="img.png" alt="Test Image">
@@ -120,6 +97,9 @@
             <button type="submit">Caută</button>
         </form>
     </div>
+
+    <script src="putRequest.js"></script>
+
 
 </body>
 </html>
