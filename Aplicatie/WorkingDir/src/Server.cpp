@@ -35,7 +35,7 @@ Server::Server(int port, int number_of_threads) : port(port),opt(1),pool(number_
 Server::~Server() {
 }
 
-void Server::handleMethods(const char* method, char* path, int client_socket)
+void Server::handleMethods(const char* method, char* path, int client_socket, const char* buffer)
 {
     if (strcmp(method, "GET") == 0)
     {
@@ -43,9 +43,13 @@ void Server::handleMethods(const char* method, char* path, int client_socket)
         get->handleGetPath(path, client_socket);
         free(get);
     } else if (strcmp(method, "POST") == 0) {
-       // handlePostPath(path);
+        PostHandler* post = new PostHandler();
+        post->handlePostRequest(path,client_socket,buffer);
+        free(post);
     } else if (strcmp(method, "PUT") == 0) {
-       // handlePutPath(path);
+        PutHandler* put = new PutHandler();
+        put->handlePutRequest(path, client_socket, buffer);
+        free(put);
     }
 }
 
@@ -70,7 +74,8 @@ void Server::handleConnection(int client_socket)
     char method[16], path[256]; 
     sscanf(buffer, "%s %s", method, path);
 
-    handleMethods(method, path, client_socket);
+
+    handleMethods(method, path, client_socket, buffer);
 
     close(client_socket);
 

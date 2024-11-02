@@ -3,6 +3,8 @@
 
 #include "threadpool.h"
 #include "GetHandler.h"
+#include "PutHandler.h"
+#include "PostHandler.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +23,7 @@ public:
 
 private:
     void handleConnection(int client_socket);
-    void handleMethods(const char* method, char* path, int client_socket);
+    void handleMethods(const char* method, char* path, int client_socket, const char* buffer);
 
 
     int server_fd;

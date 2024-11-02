@@ -65,8 +65,10 @@
     <!-- Formular pentru Update (PUT) -->
     <form id="updateForm">
         <h2>Actualizare Cont</h2>
-        <label for="updateUsername">Username:</label>
-        <input type="text" id="updateUsername" name="username" placeholder="Introduceți username-ul pentru update">
+        <label for="oldUsername">Old Username:</label>
+        <input type="text" id="oldUsername" name="oldUsername" placeholder="Introduceți username-ul vechi">
+        <label for="updateUsername">New Username:</label>
+        <input type="text" id="updateUsername" name="username" placeholder="Introduceți username-ul nou">
         <label for="updatePassword">New Password:</label>
         <input type="password" id="updatePassword" name="password" placeholder="Introduceți noua parolă">
         <button type="button" class="update" onclick="updateAccount()">Update</button>
@@ -92,28 +94,36 @@
                 },
                 body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) { // Verificăm dacă răspunsul nu este 200 OK
+                    return response.text().then(text => { // Extragem mesajul de eroare
+                        throw new Error(text); // Aruncăm o eroare cu mesajul de răspuns
+                    });
+                }
+                return response.text(); // Returnăm textul pentru un răspuns de succes
+            })
             .then(data => {
                 alert("Înregistrare reușită!");
                 console.log("Răspuns:", data);
             })
             .catch((error) => {
-                alert("Eroare la înregistrare.");
+                alert("Eroare la înregistrare: " + error.message); // Afișăm mesajul de eroare
                 console.error("Error:", error);
             });
         });
 
         // Funcția pentru a trimite un request PUT pentru actualizarea contului
         function updateAccount() {
-            const username = document.getElementById("updateUsername").value;
+            const oldUsername = document.getElementById("oldUsername").value;
+            const newUsername = document.getElementById("updateUsername").value;
             const password = document.getElementById("updatePassword").value;
 
-            fetch("/update", {
+            fetch("/update-user", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+                body: `oldUsername=${encodeURIComponent(oldUsername)}&username=${encodeURIComponent(newUsername)}&password=${encodeURIComponent(password)}`
             })
             .then(response => response.text())
             .then(data => {
